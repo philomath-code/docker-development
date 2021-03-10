@@ -1,0 +1,60 @@
+
+
+1. download .netstandard sdk from microsoft website
+2. verify installation: dotnet --version
+3. create new dirctory: mkdir test_microservice
+4. cd into test_microservice: cd test_microservice
+5. create new dotnet webapi:
+dotnet new webapi -o microserviceApp --no-https
+(--no-https: so there wont be a certificate issue. 
+you can omit when creating real projects)
+6. cd into microserviceApp
+7. run service: 
+dotnet run
+8. install docker: go to docker website
+9. verify docker install from powershell
+docker --version
+10. create Dockerfile (no extensions) in microserviceApp directory
+11. example Dockerfile content for this particular build: 5.0 netstandard sdk
+Dockerfile - contents below
+-----------------------------
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+WORKDIR /src
+COPY microserviceApp.csproj .
+RUN dotnet restore
+COPY . .
+RUN dotnet publish -c release -o /app
+
+FROM mcr.microsoft.com/dotnet/aspnet:5.0
+WORKDIR /app
+COPY --from=build /app .
+ENTRYPOINT ["dotnet", "microserviceApp.dll"]
+---------------------
+12. create .dockerignore file
+
+touch .dockerignore
+
+add content below:
+------------------ 
+Dockerfile
+[b|B]in
+[O|o]bj
+-----------------
+13. build docker image
+docker build -t microserviceApp .
+
+14. see list of images on machine:
+docker images
+
+15. run docker image
+docker run -it --rm -p 3000:80 --name mymicroservicecontainer microserviceApp
+
+16. browse in local browser: 
+http://localhost:3000/WeatherForecast
+
+----------------------------------
+
+next steps: 
+deploy to azure or 
+deploy to kubernetes
+
