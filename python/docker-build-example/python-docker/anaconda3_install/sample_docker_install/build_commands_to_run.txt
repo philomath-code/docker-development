@@ -1,0 +1,1 @@
+docker build --tag anaconda3-test0 .
